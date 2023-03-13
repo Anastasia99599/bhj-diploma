@@ -10,13 +10,13 @@
     if (options.method === "GET") {
         options.url += "?";
         for (let key in options.data) {
-            options.url += `${key}=${options.data[key]}&`
+            options.url += `${key}=${options.data[key]}`
         }
     } else {
-        Array.from(options.data).forEach(key => {
+        Object.keys(options.data).forEach(key => {
             formData.append(key, options.data[key]);
         });   
-    }
+    } 
 
     try {
       xhr.open(options.method, options.url);
@@ -27,6 +27,6 @@
       options.callback(err);
     }
 
-    xhr.addEventListener("load", options.callback(null, xhr.response));
-    xhr.addEventListener("error", options.callback(xhr.statusText, null));
+    xhr.addEventListener('load', () => options.callback(null, xhr.response);
+    xhr.addEventListener('error', options.callback(xhr.statusText, null));
 };
