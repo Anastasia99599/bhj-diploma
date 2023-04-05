@@ -3,7 +3,7 @@
  * регистрацией пользователя из приложения
  * Имеет свойство URL, равное '/user'.
  * */
- class User {
+class User {
   static URL = "/user"
   /**
    * Устанавливает текущего пользователя в
@@ -37,7 +37,6 @@
     createRequest({
       url: this.URL + "/current",
       method: "GET",
-      responseType: "json",
       callback: (err, response) => {
         if (response && response.user) {
           this.setCurrent(response.user);
@@ -59,7 +58,6 @@
     createRequest({
       url: this.URL + '/login',
       method: 'POST',
-      responseType: 'json',
       data,
       callback: (err, response) => {
         if (response && response.user) {
@@ -80,7 +78,6 @@
     createRequest({
       url: this.URL + "/register",
       method: "POST",
-      responseType: "json",
       data,
       callback: (err, response) => {
         if (response && response.user) {
@@ -97,11 +94,10 @@
    * */
   static logout(callback) {
     createRequest({
-      url: this.URL + "/login",
+      url: this.URL + "/logout",
       method: "POST",
-      responseType: "json",
       callback: (err, response) => {
-        if (response) {
+        if (response && response.user) {
           this.unsetCurrent();
         } 
         callback(err, response); 
