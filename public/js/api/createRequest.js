@@ -1,34 +1,67 @@
-/**
- * Основная функция для совершения запросов
- * на сервер.
- * */
-const createRequest = (options = {}) => {
+const handleError = (error) => {
+    if (App.state !== 'init' && Object.keys(error).length) {
+      let content = 'Сервер сообщил об ошибке: ';
+  
+      if (typeof error === 'object') {
+        content += Object.values(error).join(' ');
+      } else {
+        content += error;
+      }
+  
+      if (/[^.]$/.test(content)) {
+        content += '.';
+      }
+  
+      console.error(content);
+    }
+  }
+  
+  /**
+   * Основная функция для совершения запросов
+   * на сервер.
+   * */
+  const createRequest = (options) => {
+    if (!options) {
+      throw new Error('Параметр options функции createRequest не задан');
+    }
+  
+    let {url, headers, data, responseType, method, callback} = options;
     const xhr = new XMLHttpRequest();
-    let formData = new FormData();
-    xhr.responseType = "json";
-    let requestUrl = options.url;
-    
-    if (options.method === "GET") {
-        requestUrl += "?";
-        for (let key in options.data) {
-            requestUrl += `${key}=${options.data[key]}&`;
-        }
-        requestUrl = requestUrl.slice(0, -1);
-    } else { 
-        for (let key in options.data) {
-            formData.append(key, options.data[key]);
-        }
-    }
-
+  
     try {
-      xhr.open(options.method, requestUrl);
-      xhr.send(formData);
+      xhr.open(method, url);
+      xhr.responseType = responseType;
+      xhr.withCredentials = true;
+  
+      if (headers) {
+        for (const [key, value] of Object.entries(headers)) {
+          xhr.setRequestHeader(key, value);
+        }
+      }
+  
+      xhr.onloadend = () => {
+        if (String(xhr.status).startsWith('2')) {
+          callback(xhr.response?.error, xhr.response);
+        } else {
+          let content = 'Сервер не принял запрос. ';
+          content += `Ошибка ${xhr.status}: ${xhr.statusText}.`;
+          console.error(content);
+        }
+      }
+  
+      if (data === undefined) {
+        xhr.send();
+      } else {
+        const formData = new FormData();
+  
+        for (const [key, value] of Object.entries(data)) {
+          formData.append(key, value);
+        }
+  
+        xhr.send(formData);
+      }
     }
-    catch (err) {
-      // перехват сетевой ошибки
-      options.callback(err);
+    catch (e) {
+      console.error(e);
     }
-
-    xhr.addEventListener("load", () => options.callback(null, xhr.response));
-    xhr.addEventListener("error", () => options.callback(xhr.statusText, null));
-};
+  };
