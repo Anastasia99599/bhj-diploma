@@ -18,50 +18,51 @@ class Sidebar {
    * при нажатии на кнопку .sidebar-toggle
    * */
   static initToggleButton() {
-    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    
+    const buttonSlideBarToggle = document.querySelector('.sidebar-toggle');
+    buttonSlideBarToggle.addEventListener('click', () => {
+      const elementSidebarMini = document.querySelector('.sidebar-mini');
+      elementSidebarMini.classList.toggle('sidebar-open');
+      elementSidebarMini.classList.toggle('sidebar-collapse');
 
-    sidebarToggle.onclick = () => {
-      document.body.classList.toggle('sidebar-open');
-      document.body.classList.toggle('sidebar-collapse');
-    }
+    });
   }
 
   /**
    * При нажатии на кнопку входа, показывает окно входа
    * (через найденное в App.getModal)
-   * При нажатии на кнопку регистрации показывает окно регистрации
+   * При нажатии на кнопку регастрации показывает окно регистрации
    * При нажатии на кнопку выхода вызывает User.logout и по успешному
    * выходу устанавливает App.setState( 'init' )
    * */
   static initAuthLinks() {
-    const menuItems = document.getElementsByClassName('menu-item');
+    const menuItemLogin = document.querySelector('.menu-item_login');
+    menuItemLogin.addEventListener('click',() => {      
+      const modalLogin = App.getModal('login');      
+      
+      // Метод registerEvents вызывать в конструкторе Modal 
+      //modalLogin.registerEvents();
 
-    for (const item of menuItems) {
-      let handler;
+      modalLogin.open();
+    });
+    
+    const menuItemRegister = document.querySelector('.menu-item_register');
+    menuItemRegister.addEventListener('click',() => {      
+      const modalRegister = App.getModal('register');      
+      
+      // Метод registerEvents вызывать в конструкторе Modal 
+      //modalRegister.registerEvents();
 
-      if (item.classList.contains('menu-item_login')) {
-        handler = () => {
-          App.getModal('login').open();
-        }
-      } else if (item.classList.contains('menu-item_register')) {
-        handler = () => {
-          App.getModal('register').open();
-        }
-      } else if (item.classList.contains('menu-item_logout')) {
-        handler = () => {
-          const callback = (error) => {
-            if (error) {
-              handleError(error);
-            } else {
-              App.setState('init');
-            }
-          };
-
-          User.logout(User.current(), callback);
-        }
-      }
-
-      item.onclick = handler;
-    }
+      modalRegister.open();
+    });
+    
+    const menuItemLogout = document.querySelector('.menu-item_logout');
+    menuItemLogout.addEventListener('click',() => {      
+      User.logout((err, response) => {
+        if (response && response.success) {
+          App.setState('init');
+        }        
+      });
+    });
   }
 }

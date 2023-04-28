@@ -11,9 +11,9 @@ class UserWidget {
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor(element){
+  constructor(element){    
     if (!element) {
-      throw new Error("Элемента не существует");
+      throw new Error('Переданный элемент не существует!');
     }
     this.element = element;
   }
@@ -25,10 +25,9 @@ class UserWidget {
    * в элемент .user-name устанавливает имя
    * авторизованного пользователя
    * */
-  update(){
-    if(User.current()) {
-      const userName = document.querySelector(".user-name");
-      userName.textContent = User.current().name;
-    }
+  update(){    
+    const curUser = User.current();
+    const userName = document.querySelector('.user-name');
+    userName.textContent = curUser.name;
   }
 }

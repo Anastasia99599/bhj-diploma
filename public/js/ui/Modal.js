@@ -11,9 +11,9 @@ class Modal {
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor(element){
-    if(!element) {
-      throw new Error("Элемента не существует");
+  constructor(element){    
+    if (!element) {
+      throw new Error('Переданный элемент не существует!');
     }
     this.element = element;
     this.registerEvents();
@@ -25,31 +25,32 @@ class Modal {
    * (с помощью метода Modal.onClose)
    * */
   registerEvents() {
-    const closeBtns = this.element.querySelectorAll('[data-dismiss="modal"]');
-    closeBtns.forEach(element => {
-      element.addEventListener("click", (e) => this.onClose(e));
+    const elementsClose = this.element.querySelectorAll( 'button[data-dismiss="modal"]');    
+    elementsClose.forEach(element => {
+      element.addEventListener('click', () => {
+        this.onClose();
+      })
     });
-  
   }
-
+  
   /**
    * Срабатывает после нажатия на элементы, закрывающие окно.
    * Закрывает текущее окно (Modal.close())
    * */
-  onClose(e) {
-    e.onClick = this.close();
+  onClose(e) {    
+    this.close();
   }
   /**
    * Открывает окно: устанавливает CSS-свойство display
    * со значением «block»
    * */
   open() {
-    this.element.style.display = "block";
+    this.element.style.display = 'block';
   }
   /**
    * Закрывает окно: удаляет CSS-свойство display
    * */
-  close(){
-    this.element.style.display = "";
+  close(){    
+    this.element.style.removeProperty('display');
   }
 }

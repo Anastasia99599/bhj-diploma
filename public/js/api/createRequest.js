@@ -1,67 +1,40 @@
-const handleError = (error) => {
-    if (App.state !== 'init' && Object.keys(error).length) {
-      let content = 'Сервер сообщил об ошибке: ';
+/**
+ * Основная функция для совершения запросов
+ * на сервер.
+ * */
+const createRequest = (options = {}) => {
+    
+  const xhr = new XMLHttpRequest;
+  xhr.responseType = 'json';
+
+  const url = options.url;
+  const method = options.method;
+  const data = options.data;
+  const callback = options.callback;
+
+  let curUrl = url;
+  let err = undefined;
   
-      if (typeof error === 'object') {
-        content += Object.values(error).join(' ');
-      } else {
-        content += error;
-      }
-  
-      if (/[^.]$/.test(content)) {
-        content += '.';
-      }
-  
-      console.error(content);
-    }
+  try {
+      if (method === 'GET') {
+          let extUrl = '';
+          for (key in data) {
+              extUrl += (extUrl.length === 0 ? '' : '&') + key + '=' + data[key];
+          }        
+          curUrl = curUrl + '?' + extUrl;                   
+      }   
+      xhr.open(method, curUrl);
+      xhr.send(data);
+  } catch (err) {
+      callback(err);
   }
-  
-  /**
-   * Основная функция для совершения запросов
-   * на сервер.
-   * */
-  const createRequest = (options) => {
-    if (!options) {
-      throw new Error('Параметр options функции createRequest не задан');
-    }
-  
-    let {url, headers, data, responseType, method, callback} = options;
-    const xhr = new XMLHttpRequest();
-  
-    try {
-      xhr.open(method, url);
-      xhr.responseType = responseType;
-      xhr.withCredentials = true;
-  
-      if (headers) {
-        for (const [key, value] of Object.entries(headers)) {
-          xhr.setRequestHeader(key, value);
-        }
-      }
-  
-      xhr.onloadend = () => {
-        if (String(xhr.status).startsWith('2')) {
-          callback(xhr.response?.error, xhr.response);
-        } else {
-          let content = 'Сервер не принял запрос. ';
-          content += `Ошибка ${xhr.status}: ${xhr.statusText}.`;
-          console.error(content);
-        }
-      }
-  
-      if (data === undefined) {
-        xhr.send();
-      } else {
-        const formData = new FormData();
-  
-        for (const [key, value] of Object.entries(data)) {
-          formData.append(key, value);
-        }
-  
-        xhr.send(formData);
-      }
-    }
-    catch (e) {
-      console.error(e);
-    }
-  };
+
+
+  // событие load выполняется если запрос завершился успешно 
+  xhr.addEventListener('load', () => {                              
+      if (callback) {
+          callback(err, xhr.response);
+      }        
+  });
+     
+};
